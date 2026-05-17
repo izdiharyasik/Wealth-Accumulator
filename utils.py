@@ -10,10 +10,8 @@ PROFILE = {
     "nationality": "Indonesian",
     "age": 25,
     "base": "Jakarta",
-    "active_horizon": "3 years active pre-London, then low-touch",
-    "departure": "September 2026",
+    "active_horizon": "3 years active, then low-touch mode",
     "risk": "Moderate-aggressive without margin",
-    "constraint": "Autopilot-manageable during London study period",
 }
 ASSET_CLASSES = ["US ETFs", "IDX Stocks", "SBN/ORI Bonds", "Gold", "BTC", "USD Cash"]
 COLORS = {
@@ -30,7 +28,7 @@ def setup_page(title: str, icon: str = "💰") -> None:
     st.set_page_config(page_title=f"{APP_NAME} | {title}", page_icon=icon, layout="wide")
     inject_theme()
     st.sidebar.title("💰 WealthAccumulator")
-    st.sidebar.caption("Jakarta → London autopilot portfolio OS")
+    st.sidebar.caption("Institutional-grade wealth accumulation toolkit")
     st.sidebar.markdown("---")
     st.sidebar.info(
         "Profile: Indonesian, age 25, Jakarta-based, moderate-aggressive, "

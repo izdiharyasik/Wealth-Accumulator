@@ -1,24 +1,25 @@
 import pandas as pd
 import streamlit as st
 
-from utils import ASSET_CLASSES, allocation_from_profile, allocation_table, pie_chart, rp, setup_page
+from utils import ASSET_CLASSES, allocation_from_profile, pie_chart, rp, setup_page
 
 setup_page("Rebalancing Monitor", "⚖️")
-st.title("⚖️ Module 5 — Rebalancing Monitor")
-st.caption("Trigger rebalancing when any asset class drifts more than ±5 percentage points from target.")
+st.title("⚖️ Rebalancing Monitor")
+st.caption("Use this quarterly or when markets move significantly — not a daily tool.")
+st.info("💡 You only need this tab when you suspect drift. Run it quarterly or after a major market move.")
 
 default_target = st.session_state.get("target_allocation", allocation_from_profile(st.session_state.get("risk", 70), st.session_state.get("horizon", 36), st.session_state.get("usd_pref", 55)))
 
-st.subheader("Current holdings")
 values = {}
-cols = st.columns(2)
-for idx, asset in enumerate(ASSET_CLASSES):
-    values[asset] = cols[idx % 2].number_input(f"{asset} value (IDR)", min_value=0, value=int(st.session_state.get(f"holding_{asset}", 0)), step=1_000_000)
-    st.session_state[f"holding_{asset}"] = values[asset]
+with st.expander("📥 Enter current holdings", expanded=False):
+    cols = st.columns(2)
+    for idx, asset in enumerate(ASSET_CLASSES):
+        values[asset] = cols[idx % 2].number_input(f"{asset} value (IDR)", min_value=0, value=int(st.session_state.get(f"holding_{asset}", 0)), step=1_000_000)
+        st.session_state[f"holding_{asset}"] = values[asset]
 
 total = sum(values.values())
 if total == 0:
-    st.info("Enter current portfolio holdings to calculate drift.")
+    st.info("Enter at least one non-zero holding to calculate drift and recommended actions.")
     st.stop()
 
 rows = []
@@ -51,6 +52,3 @@ else:
 
 current_allocation = {asset: values[asset] / total * 100 for asset in ASSET_CLASSES}
 st.plotly_chart(pie_chart(current_allocation, "Current allocation"), use_container_width=True)
-
-with st.expander("Current target allocation"):
-    st.dataframe(allocation_table(default_target, total), use_container_width=True, hide_index=True)

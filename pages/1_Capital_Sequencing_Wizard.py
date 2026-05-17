@@ -65,11 +65,11 @@ steps = [
     (1, "Deductibles + immediate cash buffer", min(free_cash_flow * 0.25, max(monthly_expenses - emergency_fund, 0)), "High" if emergency_fund < monthly_expenses else "Low", "Keep at least 1 month of Jakarta expenses liquid before investing."),
     (2, "Employer match", free_cash_flow * 0.05 if employer_match else 0, "High" if employer_match else "Low", "Capture guaranteed compensation if available."),
     (3, "Pay high-interest debt >6%", min(free_cash_flow * 0.60, high_interest_debt), "High" if high_interest_debt else "Low", "Anything above the 6% threshold outranks risky assets."),
-    (4, "Build 3–6 month emergency fund", min(free_cash_flow * 0.40, emergency_gap), "High" if emergency_gap else "Low", "Target six months before London for currency and relocation resilience."),
+    (4, "Build 3–6 month emergency fund", min(free_cash_flow * 0.40, emergency_gap), "High" if emergency_gap else "Low", "Target six months of expenses for currency and life-transition resilience."),
     (5, "Tax/retirement wrappers or equivalents", free_cash_flow * 0.10, "Medium", "Use any available formal long-term savings vehicle without sacrificing liquidity."),
     (6, "Max moderate-return debt cleanup", min(free_cash_flow * 0.15, low_interest_debt), "Medium" if low_interest_debt else "Low", "Accelerate low-rate debt only after buffers are strong."),
-    (7, "Core no-margin investing", free_cash_flow * 0.45 if high_interest_debt == 0 and emergency_gap == 0 else free_cash_flow * 0.15, "Medium", "DCA into US ETF/IDX core while preserving autopilot simplicity."),
-    (8, "Pre-London sinking funds", free_cash_flow * 0.15, "Medium", "Ring-fence visa, flights, deposits, GBP setup cash, and relocation costs."),
+    (7, "Core no-margin investing", free_cash_flow * 0.45 if high_interest_debt == 0 and emergency_gap == 0 else free_cash_flow * 0.15, "Medium", "DCA into US ETF/IDX core while preserving low-touch simplicity."),
+    (8, "Major-goal sinking funds", free_cash_flow * 0.15, "Medium", "Ring-fence education, travel, housing deposits, foreign-currency setup cash, and major planned costs."),
     (9, "Tactical/aspirational bucket", free_cash_flow * 0.05, "Low", "Only after all prior steps are funded; no leverage or margin."),
 ]
 
@@ -85,7 +85,7 @@ if debts:
     if not flagged.empty:
         st.error(f"High-interest debt flagged above 6%: {', '.join(flagged['Debt'])}. Pause tactical investing until these are cleared.")
 else:
-    st.success("No debt balances entered. Core investing and pre-London reserves can move up the queue.")
+    st.success("No debt balances entered. Core investing and major-goal reserves can move up the queue.")
 
 st.metric("Monthly investable/free cash flow", rp(free_cash_flow))
 st.metric("Emergency fund target (6 months)", rp(target_emergency), delta=f"Gap: {rp(emergency_gap)}")
