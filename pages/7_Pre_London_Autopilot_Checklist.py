@@ -4,11 +4,11 @@ import pandas as pd
 import plotly.graph_objects as go
 import streamlit as st
 
-from utils import setup_page
+from utils import hero, next_step_banner, section_header, setup_page, terminal_layout
 
 setup_page("Pre-London Autopilot Checklist", "✈️")
-st.title("✈️ Module 7 — Pre-London Autopilot Checklist")
-st.caption("Static completion tracker for actions to finish before September 2026.")
+hero("Pre-London Autopilot Checklist", "Finish these controls before September 2026 so the portfolio can run with quarterly reviews only.", "MODULE 7 // AUTOPILOT READINESS")
+section_header("CHECKLIST", "Operational hardening", "Reduce complexity, automate contributions, and remove margin-call pathways before departure.")
 
 items = [
     "Rebalance to low-touch allocation",
@@ -31,8 +31,7 @@ progress = completed / len(items)
 st.progress(progress, text=f"{completed}/{len(items)} completed ({progress:.0%})")
 
 fig = go.Figure(go.Indicator(mode="gauge+number", value=progress * 100, title={"text": "Autopilot readiness %"}, gauge={"axis": {"range": [0, 100]}, "bar": {"color": "#06d6a0"}}))
-fig.update_layout(template="plotly_dark", paper_bgcolor="rgba(0,0,0,0)")
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(terminal_layout(fig, "Autopilot readiness"), width="stretch")
 
 cutoff = date(2026, 9, 1)
 days_left = (cutoff - date.today()).days
@@ -40,6 +39,8 @@ if days_left >= 0:
     st.info(f"Days until September 1, 2026 autopilot deadline: {days_left}.")
 else:
     st.warning("September 1, 2026 has passed. Treat incomplete items as immediate maintenance tasks.")
+
+next_step_banner("Close the loop from autopilot back to the dashboard.", "After checklist items are complete, return to the command center for a single integrated readout rather than living inside separate tabs.", "app.py", "Command center")
 
 st.subheader("Recommended autopilot posture")
 st.dataframe(
@@ -51,6 +52,6 @@ st.dataframe(
             {"Area": "Execution", "Rule": "Automate DCA and SBN/ORI maturity tracking before departure."},
         ]
     ),
-    use_container_width=True,
+    width="stretch",
     hide_index=True,
 )

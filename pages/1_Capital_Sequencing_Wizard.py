@@ -1,11 +1,10 @@
 import pandas as pd
 import streamlit as st
 
-from utils import rp, setup_page
+from utils import hero, next_step_banner, rp, section_header, setup_page, styled_action_table
 
 setup_page("Capital Sequencing Wizard", "🧭")
-st.title("🧭 Module 1 — Capital Sequencing Wizard")
-st.caption("Nine-step financial order of operations, localized for an IDR income base and a no-margin investment policy.")
+hero("Capital Sequencing Wizard", "Nine-step financial order of operations localized for an IDR income base and a no-margin investment policy.", "MODULE 1 // CASHFLOW COMMAND")
 
 with st.form("capital_sequence_form"):
     col1, col2 = st.columns(2)
@@ -74,13 +73,15 @@ steps = [
 ]
 
 df = pd.DataFrame(steps, columns=["Step", "Priority", "Suggested Monthly Rp", "Urgency", "Rationale"])
-st.subheader("Prioritized action plan")
-st.dataframe(df.assign(**{"Suggested Monthly Rp": df["Suggested Monthly Rp"].map(rp)}), use_container_width=True, hide_index=True)
+section_header("ACTION PLAN", "Prioritized cashflow queue", "High urgency appears red, medium amber, and low green so the next move is obvious.")
+urgency_df = df.assign(**{"Suggested Monthly Rp": df["Suggested Monthly Rp"].map(rp)})
+st.dataframe(styled_action_table(urgency_df, "Urgency"), width="stretch", hide_index=True)
+next_step_banner("Convert the cashflow decision into a target mix.", "Once the monthly queue is clear, send deployable capital to the Portfolio Allocator so the portfolio target drives every later screen.", "pages/2_Portfolio_Allocator.py", "Strategic allocation")
 
 if debts:
     debt_df = pd.DataFrame(debts)
     st.subheader("Debt screen")
-    st.dataframe(debt_df.assign(Balance=debt_df["Balance"].map(rp)), use_container_width=True, hide_index=True)
+    st.dataframe(debt_df.assign(Balance=debt_df["Balance"].map(rp)), width="stretch", hide_index=True)
     flagged = debt_df[debt_df["APR %"] > 6]
     if not flagged.empty:
         st.error(f"High-interest debt flagged above 6%: {', '.join(flagged['Debt'])}. Pause tactical investing until these are cleared.")
