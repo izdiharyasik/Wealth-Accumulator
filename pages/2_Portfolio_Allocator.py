@@ -1,10 +1,10 @@
 import streamlit as st
 
-from utils import allocation_from_profile, allocation_table, pie_chart, rp, setup_page
+from utils import allocation_from_profile, allocation_table, hero, next_step_banner, pie_chart, rp, section_header, setup_page
 
 setup_page("Portfolio Allocator", "🥧")
-st.title("🥧 Module 2 — Portfolio Allocator")
-st.caption("Phase 3 only: 100% invested/allocated capital, no margin, and designed for low-touch mode.")
+hero("Portfolio Allocator", "Phase 3 capital map: fully allocated, no margin, designed for low-touch mode and clean rebalancing.", "MODULE 2 // STRATEGIC ALLOCATION")
+section_header("INPUT", "Allocation controls", "Tune risk, time-to-autopilot, and USD preference while keeping BTC capped and leverage disabled.")
 
 col1, col2 = st.columns(2)
 total_capital = col1.number_input("Total capital (IDR)", min_value=0, value=int(st.session_state.get("total_capital", 150_000_000)), step=5_000_000)
@@ -16,11 +16,12 @@ st.session_state.update(total_capital=total_capital, risk=risk, horizon=horizon,
 allocation = allocation_from_profile(risk, horizon, usd_pref)
 st.session_state["target_allocation"] = allocation
 
-st.plotly_chart(pie_chart(allocation, "Recommended strategic allocation"), use_container_width=True)
-st.dataframe(allocation_table(allocation, total_capital), use_container_width=True, hide_index=True)
+st.plotly_chart(pie_chart(allocation, "Recommended strategic allocation"), width="stretch")
+st.dataframe(allocation_table(allocation, total_capital), width="stretch", hide_index=True)
 
-st.info("Position sizing guardrails: keep individual core positions around 5–15%, tactical satellites around 2–5%, hedges around 1–3%, and BTC capped at 2% of portfolio value.")
+section_header("GUARDRAILS", "Sizing discipline", "Core positions 5–15%, tactical satellites 2–5%, hedges 1–3%, and BTC capped at 2% of portfolio value.")
 st.warning("This model intentionally skips leverage phases because the user can tolerate volatility but cannot tolerate margin calls.")
+next_step_banner("Use tactical screens only after the target allocation exists.", "Commodity and regime views should tilt new cash or watchlists, not override the strategic mix or BTC cap.", "pages/3_Commodity_Supercycle_Screener.py", "Tactical watchlist")
 
 
 lean = "growth" if risk >= 60 and horizon >= 24 else "defensive"

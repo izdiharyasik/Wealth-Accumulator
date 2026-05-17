@@ -1,12 +1,11 @@
 import pandas as pd
 import streamlit as st
 
-from utils import ASSET_CLASSES, allocation_from_profile, pie_chart, rp, setup_page
+from utils import ASSET_CLASSES, allocation_from_profile, hero, next_step_banner, pie_chart, rp, section_header, setup_page, styled_action_table
 
 setup_page("Rebalancing Monitor", "⚖️")
-st.title("⚖️ Rebalancing Monitor")
-st.caption("Use this quarterly or when markets move significantly — not a daily tool.")
-st.info("💡 You only need this tab when you suspect drift. Run it quarterly or after a major market move.")
+hero("Rebalancing Monitor", "Quarterly drift control for a low-touch, no-margin portfolio. Green buys underweight assets; red sells overweight risk.", "MODULE 5 // DRIFT DISCIPLINE")
+section_header("INPUT", "Current holdings", "Use this only quarterly or after a major market move — not as a daily trading prompt.")
 
 default_target = st.session_state.get("target_allocation", allocation_from_profile(st.session_state.get("risk", 70), st.session_state.get("horizon", 36), st.session_state.get("usd_pref", 55)))
 
@@ -40,15 +39,16 @@ for asset in ASSET_CLASSES:
     rows.append({"Asset": asset, "Current %": round(current_pct, 1), "Target %": target_pct, "Drift %": round(drift, 1), "Action": action, "Amount": action_amount})
 
 drift_df = pd.DataFrame(rows)
-st.subheader("Drift monitor")
-st.dataframe(drift_df.assign(Amount=drift_df["Amount"].map(rp)), use_container_width=True, hide_index=True)
+section_header("OUTPUT", "Drift monitor", "Actions are color-coded consistently: BUY is green, HOLD is blue, SELL is red.")
+st.dataframe(styled_action_table(drift_df.assign(Amount=drift_df["Amount"].map(rp)), "Action"), width="stretch", hide_index=True)
 
 alerts = drift_df[drift_df["Action"] != "HOLD"]
 if alerts.empty:
     st.success("All asset classes are within the ±5% drift band. No rebalance needed.")
 else:
     st.warning("Rebalancing trigger active for one or more asset classes.")
-    st.dataframe(alerts.assign(Amount=alerts["Amount"].map(rp)), use_container_width=True, hide_index=True)
+    st.dataframe(styled_action_table(alerts.assign(Amount=alerts["Amount"].map(rp)), "Action"), width="stretch", hide_index=True)
 
 current_allocation = {asset: values[asset] / total * 100 for asset in ASSET_CLASSES}
-st.plotly_chart(pie_chart(current_allocation, "Current allocation"), use_container_width=True)
+st.plotly_chart(pie_chart(current_allocation, "Current allocation"), width="stretch")
+next_step_banner("Check whether the disciplined plan reaches your milestones.", "After drift actions are known, use the simulator to see how contribution rate and CAGR assumptions affect the active 3-year window.", "pages/6_Wealth_Growth_Simulator.py", "Trajectory")

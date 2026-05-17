@@ -2,17 +2,14 @@ import pandas as pd
 import streamlit as st
 import yfinance as yf
 
-from utils import PROFILE, line_chart, rp, setup_page
+from utils import PROFILE, hero, line_chart, next_step_banner, rp, section_header, setup_page, workflow_links, workflow_overview
 
 setup_page("Dashboard", "🏠")
 
-st.title("🏠 WealthAccumulator Dashboard")
-st.subheader("Macro-aware wealth accumulation and low-touch portfolio management")
-
-st.markdown(
-    """
-    WealthAccumulator is designed for a 25-year-old Indonesian investor based in Jakarta who wants to compound capital aggressively, avoid margin-call risk, and keep the portfolio manageable throughout the investment horizon.
-    """
+hero(
+    "WealthAccumulator Terminal",
+    "Macro-aware cockpit for aggressive compounding without leverage: grow capital, avoid forced liquidation, and transition cleanly into low-touch mode.",
+    "DASHBOARD // JAKARTA BASE // NO MARGIN",
 )
 
 cols = st.columns(4)
@@ -25,10 +22,17 @@ metrics = [
 for col, (label, value) in zip(cols, metrics):
     col.metric(label, value)
 
-st.markdown("---")
+section_header("COMMAND CENTER", "One integrated workflow", "Use the app left-to-right: cashflow first, allocation second, tactical screens third, then regime/rebalance/simulation/autopilot.")
+workflow_overview("Dashboard")
+workflow_links()
+next_step_banner(
+    "Start with the next rupiah, not a disconnected tab.",
+    "The Capital Sequencing Wizard decides whether cash should fill buffers, kill debt, or fund the portfolio before any screener matters.",
+    "pages/1_Capital_Sequencing_Wizard.py",
+    "Cashflow order",
+)
 
-# Section 1 — Macro Conditions Panel
-st.header("Section 1 — Macro Conditions Panel")
+section_header("SECTION 1", "Macro Conditions Panel", "Read the market like a cockpit: green is supportive, amber is caution, red is defensive.")
 
 ASSETS = {
     "SPY": {"label": "S&P 500", "context": "equity risk appetite"},
@@ -87,7 +91,7 @@ if not macro_data.empty:
             metric_cols[idx].warning(f"{meta['label']} unavailable: {exc}")
 
 if macro_rows:
-    st.subheader("Mini regime summary")
+    st.subheader("Regime tape")
     for row in macro_rows:
         if row["Asset"] == "Gold":
             interpretation = "mild risk-off rotation signal" if row["Label"].startswith("Above") else "weaker defensive bid"
@@ -101,10 +105,7 @@ if macro_rows:
 else:
     st.info("Macro cards will populate when yfinance data is available.")
 
-st.markdown("---")
-
-# Section 2 — Portfolio Trajectory
-st.header("Section 2 — Portfolio Trajectory")
+section_header("SECTION 2", "Portfolio Trajectory", "Scenario curves for the next active compounding window before low-touch execution.")
 
 with st.expander("✏️ Edit assumptions", expanded=False):
     col1, col2 = st.columns(2)
@@ -145,15 +146,12 @@ trajectory_df = pd.DataFrame(trajectory)
 fig = line_chart(trajectory_df, "Portfolio trajectory")
 for milestone in [100_000_000, 500_000_000, 1_000_000_000]:
     fig.add_hline(y=milestone, line_dash="dot", annotation_text=rp(milestone), annotation_position="top left")
-st.plotly_chart(fig, use_container_width=True)
+st.plotly_chart(fig, width="stretch")
 base_column = [col for col in trajectory_df.columns if col.startswith("Base")][0]
 base_value = float(trajectory_df[base_column].iloc[-1])
 st.caption(f"At your current Base trajectory, you reach {rp(base_value)} in {horizon} months.")
 
-st.markdown("---")
-
-# Section 3 — News Feed
-st.header("Section 3 — News Feed")
+section_header("SECTION 3", "Macro News Feed", "Persistent themes to monitor without overtrading.")
 news = pd.DataFrame(
     [
         {"Theme": "AI buildout", "Signal": "Sustained capex in chips, power, cooling, and cloud infrastructure.", "Implication for portfolio": "Supports US ETF beta and selected commodity-linked exposure, but avoid overconcentration."},
@@ -164,5 +162,5 @@ news = pd.DataFrame(
         {"Theme": "Crypto institutional adoption", "Signal": "ETF flows and custody infrastructure improve access, but drawdowns remain severe.", "Implication for portfolio": "BTC can stay at 1–2%; avoid letting volatility dominate the portfolio."},
     ]
 )
-st.dataframe(news, use_container_width=True, hide_index=True)
+st.dataframe(news, width="stretch", hide_index=True)
 st.caption(f"Last updated: {pd.Timestamp.now(tz='Asia/Jakarta').strftime('%Y-%m-%d %H:%M %Z')}")
