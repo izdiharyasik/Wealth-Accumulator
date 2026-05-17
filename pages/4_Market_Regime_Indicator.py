@@ -14,8 +14,13 @@ st.session_state["regime_ticker"] = ticker
 def load_prices(symbol: str):
     return yf.download(symbol, period="1y", interval="1d", progress=False, auto_adjust=True)
 
-data = load_prices(ticker)
-if data.empty or "Close" not in data:
+try:
+    data = load_prices(ticker)
+except Exception as exc:  # yfinance can fail because of connectivity or upstream rate limits.
+    data = None
+    st.warning(f"Live regime data is unavailable right now: {exc}")
+
+if data is None or data.empty or "Close" not in data:
     st.error("No market data returned. Check ticker or yfinance connectivity.")
 else:
     close = data["Close"]
